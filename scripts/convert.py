@@ -1,13 +1,21 @@
+import os
 from pathlib import Path
 import json
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 PLUGINS_DIR = ROOT / "plugins"
-GITHUB_REPOSITORY = "fcolors/openai-plugins-zcode"
+# GitHub Actions provides GITHUB_REPOSITORY (owner/repo) and GITHUB_REF_NAME,
+# so a fork automatically publishes its own install source. Local runs fall
+# back to this repository.
+GITHUB_REPOSITORY = os.environ.get(
+    "GITHUB_REPOSITORY",
+    "long45343/openai-plugins-zcode",
+)
+GITHUB_REF_NAME = os.environ.get("GITHUB_REF_NAME", "main")
 REPOSITORY_RAW_URL = (
     "https://raw.githubusercontent.com/"
-    f"{GITHUB_REPOSITORY}/main"
+    f"{GITHUB_REPOSITORY}/{GITHUB_REF_NAME}"
 )
 
 # ZCode 当前支持的 plugin.json 字段
@@ -135,7 +143,7 @@ for plugin_dir in sorted(PLUGINS_DIR.iterdir()):
             "source": "github",
             "repo": GITHUB_REPOSITORY,
             "path": f"plugins/{plugin_dir.name}",
-            "ref": "main",
+            "ref": GITHUB_REF_NAME,
         },
     }
 
